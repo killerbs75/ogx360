@@ -258,7 +258,7 @@ int main(void)
 					//Click BACK + the stick to toggle through the types of stick inversion
 					if (getButtonPress(BACK, i) && Xbox360Wireless.getButtonClick(L3, i)) {
 						invertLS[i]++;
-						if (invertLS[i] == 4) invertRS[i] = 0;
+						if (invertLS[i] == 4) invertLS[i] = 0;
 					}		
 					if (getButtonPress(BACK, i) && Xbox360Wireless.getButtonClick(R3, i)) {
 						invertRS[i]++;
