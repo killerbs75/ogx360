@@ -250,10 +250,60 @@ int main(void)
 					XboxOGDuke[i].R = getButtonPress(R2, i); //0x00 to 0xFF
 
 					//Read Control Sticks (16bit signed short)
-					XboxOGDuke[i].leftStickX = getAnalogHat(LeftHatX, i);
-					XboxOGDuke[i].leftStickY = getAnalogHat(LeftHatY, i);
-					XboxOGDuke[i].rightStickX = getAnalogHat(RightHatX, i);
-					XboxOGDuke[i].rightStickY = getAnalogHat(RightHatY, i);
+
+					static uint8_t invertLS[4] = {0,0,0,0};  //inversion state of left sticks
+					static uint8_t invertRS[4] = {0,0,0,0};  //inversion state of right sticks
+						
+					//Detects changes in stick configuration
+					//Click BACK + the stick to toggle through the types of stick inversion
+					if (getButtonPress(BACK, i) && Xbox360Wireless.getButtonClick(L3, i)) {
+						invertLS[i]++;
+						if (invertLS[i] == 4) invertRS[i] = 0;
+					}		
+					if (getButtonPress(BACK, i) && Xbox360Wireless.getButtonClick(R3, i)) {
+						invertRS[i]++;
+						if (invertRS[i] == 4) invertRS[i] = 0;
+					}
+					
+															
+					// Left Stick
+					switch(invertLS[i])	{	
+						case 1 :  //value of 1 is invert Y axis only
+							XboxOGDuke[i].leftStickX = getAnalogHat(LeftHatX, i);
+							XboxOGDuke[i].leftStickY = -(getAnalogHat(LeftHatY, i) + 1);
+							break;							
+						case 2 :  //value of 2 is invert X axis only
+							XboxOGDuke[i].leftStickX = -(getAnalogHat(LeftHatX, i) + 1);
+							XboxOGDuke[i].leftStickY = getAnalogHat(LeftHatY, i);						
+							break;
+						case 3 :  //value of 3 is invert both axes
+							XboxOGDuke[i].leftStickX = -(getAnalogHat(LeftHatX, i) + 1);
+							XboxOGDuke[i].leftStickY = -(getAnalogHat(LeftHatY, i) + 1);						
+							break;
+						default :
+							XboxOGDuke[i].leftStickX = getAnalogHat(LeftHatX, i);
+							XboxOGDuke[i].leftStickY = getAnalogHat(LeftHatY, i);
+					}
+					
+					// Right Stick
+					switch(invertRS[i]) {
+						case 1 :  //value of 1 is invert Y axis only
+							XboxOGDuke[i].rightStickX = getAnalogHat(RightHatX, i);
+							XboxOGDuke[i].rightStickY = -(getAnalogHat(RightHatY, i) + 1);	
+							break;
+						case 2 :  //value of 2 is invert X axis only
+							XboxOGDuke[i].rightStickX = -(getAnalogHat(RightHatX, i) + 1);
+							XboxOGDuke[i].rightStickY = getAnalogHat(RightHatY, i);						
+							break;
+						case 3 :  //value of 3 is invert both axes
+							XboxOGDuke[i].rightStickX = -(getAnalogHat(RightHatX, i) + 1);
+							XboxOGDuke[i].rightStickY = -(getAnalogHat(RightHatY, i) + 1);
+							break;
+						default :
+							XboxOGDuke[i].rightStickX = getAnalogHat(RightHatX, i);
+							XboxOGDuke[i].rightStickY = getAnalogHat(RightHatY, i);						
+					}
+					
 				}
 				#ifdef SUPPORTBATTALION
 				//Button Mapping for Steel Battalion Controller - only applicable for player 1 and Xbox 360 Wireless Controllers
